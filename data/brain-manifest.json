@@ -1,0 +1,53 @@
+{
+  "name": "Fruity OL brain model",
+  "version": "b1df679b1137",
+  "total": 51362315,
+  "groups": {
+    "core": 3278984,
+    "whole": 48083331
+  },
+  "files": [
+    {
+      "path": "data/flybrain.wasm",
+      "label": "Spiking-neuron engine (WebAssembly)",
+      "group": "core",
+      "bytes": 42273,
+      "sha256": "83a16a6241da924e65da74acc583a1d4133dd83e17c654ef21c5814436d55125"
+    },
+    {
+      "path": "data/circuit.bin.gz",
+      "label": "Learning circuit: 4,804 neurons, 1.05 M synapses",
+      "group": "core",
+      "bytes": 1600518,
+      "sha256": "d0fe0db4a3054867bafccbfaf99cb80f35d13df175f60e5d45651c48d8dad416"
+    },
+    {
+      "path": "data/circuit.json",
+      "label": "Neuron roles, glomeruli & readouts",
+      "group": "core",
+      "bytes": 239173,
+      "sha256": "f3bfa6c5438e9a8d95f64afdfd690279f51010764761be2bd2b3c393070b3365"
+    },
+    {
+      "path": "data/brainmap.bin.gz",
+      "label": "Brain map: 166,700 neuron positions",
+      "group": "core",
+      "bytes": 1280413,
+      "sha256": "c495ca64a254de1328286b3be0f0d57cdf9ec77eb7948df28e74e7098df9af6c"
+    },
+    {
+      "path": "data/brainmap.json",
+      "label": "Cell-type names for the brain map",
+      "group": "core",
+      "bytes": 116607,
+      "sha256": "50524ead5c2a96510fc8a1f8ff1d5b579b886a6198ea925ea6992987e3fc24e3"
+    },
+    {
+      "path": "data/fullbrain.bin.gz",
+      "label": "Whole connectome: 166,700 neurons, 25.6 M synapses",
+      "group": "whole",
+      "bytes": 48083331,
+      "sha256": "9eb1f9439b9f07766a00412b9cec8d60293fd7f2cbdfa1c7139063e66338b3f6"
+    }
+  ]
+}

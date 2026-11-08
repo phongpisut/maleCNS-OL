@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fruity OL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Mochiy+Pop+One&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="loading" class="loading">
+    <div class="load-card">
+      <div class="load-title" id="loadTitle">Ms. Fruity is waking up…</div>
+      <div id="consent" hidden>
+        <p class="consent-lead">Her brain is a real piece of the fruit-fly connectome, simulated right here in your browser. Choose how much of it to run:</p>
+        <div class="mode-pick">
+          <label class="mode-card"><input type="radio" name="brainMode" value="circuit">
+            <b>🧠 Learning circuit</b><span>4,804 neurons · fast · recommended</span><em id="sizeCircuit"></em></label>
+          <label class="mode-card"><input type="radio" name="brainMode" value="whole">
+            <b>🪰 Whole brain</b><span>all 166,700 neurons · ~140 MB memory · best on desktop</span><em id="sizeWhole"></em></label>
+        </div>
+        <table class="dl-table" id="dlTable"></table>
+        <p class="hint">It's a one-time download, stored in your browser so next time she wakes up instantly. Nothing is uploaded and you don't need an account. You can switch brain size later on the brain screen.</p>
+        <button class="pill-btn go" id="btnDownload">🧠 Download her brain</button>
+      </div>
+      <div id="progressBox">
+        <div class="bar"><div id="loadBar"></div></div>
+        <p id="loadText">Loading…</p>
+      </div>
+    </div>
+  </div>
+
+  <main class="app">
+    <!-- ============ SCREEN 1: her life ============ -->
+    <section class="screen on" id="gameScreen">
+      <div class="stage-wrap" id="stageWrap">
+        <canvas id="stage"></canvas>
+
+        <div class="hud-tl">
+          <div class="pill"><span class="ico">💰</span><b id="money">1,000</b>฿</div>
+          <div class="pill"><span class="ico">🕘</span><b id="clock">07:00</b><span class="sub" id="phaseLabel">Morning</span></div>
+          <div class="pill small"><span>Day <b id="day">1</b></span><span class="sub" id="sceneLabel">Home</span></div>
+          <div class="timebar" id="timebar" title="Work hours left"><div id="timeFill"></div></div>
+        </div>
+
+        <div class="hud-tr">
+          <div class="meters">
+            <div class="meter" title="Energy: when it's low she moves very slowly. Coffee refills it.">
+              <span>⚡</span><div class="mbar"><div id="energyFill" class="energy"></div></div>
+            </div>
+            <div class="meter" title="Affection: pets, food and rewards raise it. High affection makes her follow your cursor, looking for rewards.">
+              <span>💗</span><div class="mbar"><div id="affFill" class="aff"></div></div>
+            </div>
+          </div>
+          <button class="sq" id="btnShop" title="Shop: food & furniture">🎀</button>
+          <button class="sq pink" id="btnBrain" title="Her brain & training status">🧠</button>
+        </div>
+
+        <div class="hud-bl">
+          <button class="round big" id="btnGo"><span id="goIcon">💼</span><small id="goLabel">Go to office</small></button>
+        </div>
+
+        <div class="hud-br">
+          <div class="ap" id="apBox" hidden><span>Action points</span><div id="apPips"></div></div>
+          <div class="cluster">
+            <button class="round" id="btnPet" title="Pet her head (P)"><span>🫳</span><small>Pet</small></button>
+            <button class="round" id="btnScold" title="Scold (X)"><span>👎</span><small>Scold</small></button>
+            <button class="round" id="btnFollow" title="Follow my cursor (F)"><span>👆</span><small>Follow</small></button>
+            <button class="round" id="btnFeed" title="Give her food"><span>🍙</span><small>Feed</small></button>
+            <button class="round huge" id="btnReward" title="Reward (R)"><span>🍬</span><small>Reward</small></button>
+          </div>
+        </div>
+
+        <div class="hint-strip" id="hintStrip"></div>
+
+        <!-- shop -->
+        <div class="modal" id="shop" hidden>
+          <div class="sheet">
+            <div class="sheet-head"><h2>🎀 Shop</h2><span class="pill small">💰 <b id="shopMoney">0</b>฿</span><button class="x" data-close>✕</button></div>
+            <div class="tabs"><button data-shop="food" class="on">🍙 Food</button><button data-shop="furniture">🛋️ Furniture</button></div>
+            <div class="shop-grid" id="shopGrid"></div>
+          </div>
+        </div>
+        <!-- feed picker -->
+        <div class="modal" id="feedMenu" hidden>
+          <div class="sheet small">
+            <div class="sheet-head"><h2>🍙 Give her…</h2><button class="x" data-close>✕</button></div>
+            <div class="shop-grid" id="feedGrid"></div>
+            <p class="hint">Buy more food in the shop 🎀. During rest hours, feeding costs 1 action point.</p>
+          </div>
+        </div>
+        <!-- end-of-work report -->
+        <div class="modal" id="report" hidden>
+          <div class="sheet small">
+            <div class="sheet-head"><h2 id="reportTitle">Work day report</h2><button class="x" data-close>✕</button></div>
+            <div id="reportBody"></div>
+            <button class="pill-btn" data-close>Go home ♪</button>
+          </div>
+        </div>
+        <div class="toast" id="toast"></div>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 2: brain & training ============ -->
+    <section class="screen" id="brainScreen">
+      <header class="brain-top">
+        <button class="pill-btn" id="btnBack">← Back to her</button>
+        <h1>Her brain</h1>
+        <span class="sub" id="brainStats"></span>
+      </header>
+      <div class="brain-grid">
+        <div class="card brain-card">
+          <div class="brain-head">
+            <div class="tabs">
+              <button data-view="map" class="on">🧠 Brain map</button>
+              <button data-view="circuit">🕸️ Circuit</button>
+            </div>
+            <span class="sub">Hover a neuron to see what it is. Orange flashes are real spikes.</span>
+          </div>
+          <div class="brain-stage">
+            <canvas id="brainMap"></canvas>
+            <canvas id="brainCircuit" hidden></canvas>
+            <div id="neuronTip" class="neuron-tip" hidden></div>
+            <div class="legend">
+              <span><i style="background:#7fe3c4"></i>projection neurons</span>
+              <span><i style="background:#8fb0ff"></i>Kenyon cells</span>
+              <span><i style="background:#ff8fb5"></i>APL</span>
+              <span><i style="background:#ffd36b"></i>MBONs</span>
+              <span><i style="background:#d4a6ff"></i>dopamine</span>
+              <span><i style="background:#ffd180;box-shadow:0 0 6px #ffaa33"></i>spiking</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="side">
+          <div class="card">
+            <h2>Training status</h2>
+            <div class="stats" id="statsBox"></div>
+            <svg class="spark" id="spark" viewBox="0 0 300 40" preserveAspectRatio="none"></svg>
+            <p class="hint">Average reward (dopamine) over time</p>
+          </div>
+          <div class="card">
+            <h2>What she has learned <small id="brainAge"></small></h2>
+            <div class="learned" id="learnedMotor"></div>
+            <div class="learned" id="learnedSocial"></div>
+          </div>
+          <div class="card">
+            <h2>Teach a move <small>keys 1–9</small></h2>
+            <div class="grid3" id="motorBtns"></div>
+            <p class="hint">Same as clicking a machine in the office: "in this situation, do that".</p>
+          </div>
+          <div class="card">
+            <h2>Teach a reaction</h2>
+            <p class="hint" id="lastTouch">Pet, scold or feed her first, then pick how she should react.</p>
+            <div class="grid3" id="socialBtns"></div>
+          </div>
+          <div class="card">
+            <h2>Dream-train</h2>
+            <p class="hint">A background worker runs her spiking circuit through extra work shifts (auto-rewards only), then hands the learned synapses back.</p>
+            <div class="row">
+              <select id="dreamLen"><option value="10">10 dream-minutes</option><option value="30" selected>30 dream-minutes</option><option value="60">60 dream-minutes</option></select>
+              <button class="pill-btn" id="btnDream">💤 Dream</button>
+            </div>
+            <div class="bar"><div id="dreamBar"></div></div>
+            <p class="hint" id="dreamMsg"></p>
+          </div>
+          <div class="card">
+            <h2>Personality knobs</h2>
+            <label class="slider">Curiosity <input type="range" id="sTemp" min="0.01" max="0.5" step="0.01"><output></output></label>
+            <label class="slider">Learning speed <input type="range" id="sLr" min="0.02" max="0.5" step="0.01"><output></output></label>
+            <label class="slider">Memory span (λ) <input type="range" id="sLambda" min="0" max="0.95" step="0.05"><output></output></label>
+            <label class="slider">Reaction curiosity <input type="range" id="sSocialTemp" min="0.01" max="0.5" step="0.01"><output></output></label>
+            <label class="toggle"><input type="checkbox" id="optAuto" checked> Auto-rewards for work (dopamine on success)</label>
+          </div>
+          <div class="card">
+            <h2>Brain size</h2>
+            <div class="tabs" id="modeTabs">
+              <button data-mode="circuit">🧠 Learning circuit</button>
+              <button data-mode="whole">🪰 Whole brain</button>
+            </div>
+            <p class="hint" id="modeInfo"></p>
+          </div>
+          <div class="card">
+            <h2>Save</h2>
+            <div class="row wrap">
+              <button class="pill-btn" id="btnSave">💾 Save</button>
+              <button class="pill-btn" id="btnExport">⬇️ Export</button>
+              <label class="pill-btn">⬆️ Import<input type="file" id="fileImport" accept=".json,application/json" hidden></label>
+              <button class="pill-btn danger" id="btnReset">🧹 New game</button>
+            </div>
+            <p class="hint" id="saveMsg">Autosaves to this browser every 15 s.</p>
+        <div class="row wrap brain-store">
+          <span class="hint" id="brainStore">Brain model: checking…</span>
+          <button class="pill-btn" id="btnForgetBrain" title="Delete the downloaded brain model from this browser">🗑️ Remove downloaded brain</button>
+        </div>
+          </div>
+        </div>
+      </div>
+      <footer class="credits">
+        <span>Designed &amp; refined by <b>Phongpisut Meemuk</b> · Co-created with <b>Claude</b> (Anthropic)</span>
+        <span class="sub">Fruit-fly brain: <a href="https://male-cns.janelia.org/" target="_blank" rel="noopener">MaleCNS v1.0 connectome</a> (FlyEM / HHMI Janelia, Univ. of Cambridge, MRC LMB, Google Research · CC BY 4.0) · data export &amp; brain-map idea: <a href="https://huggingface.co/spaces/Xenova/fruit-fly-simulation" target="_blank" rel="noopener">Xenova/fruit-fly-simulation</a> · neuron model: <a href="https://www.nature.com/articles/s41586-024-07763-9" target="_blank" rel="noopener">Shiu et al., Nature 2024</a></span>
+      </footer>
+    </section>
+  </main>
+
+  <script src="js/assets.js"></script>
+  <script src="js/world.js"></script>
+  <script src="js/flybrain.js"></script>
+  <script src="js/rig.js"></script>
+  <script src="js/scene.js"></script>
+  <script src="js/brainview.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

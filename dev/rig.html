@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Rig preview</title>
+<style>body{margin:0;background:#f6efe4;font-family:system-ui}canvas{display:block;background:#fbf7f0;cursor:grab}#ui{position:fixed;top:6px;left:6px;display:flex;flex-wrap:wrap;gap:4px;max-width:96vw}button{font-size:12px}</style></head><body>
+<div id="ui"></div><canvas id="c"></canvas>
+<script src="../js/rig.js"></script>
+<script>
+// Drag her around to see the hair physics; buttons switch expression / pose.
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+const S=Math.min(2,devicePixelRatio||1); function rs(){cv.width=innerWidth*S;cv.height=innerHeight*S;cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';} rs(); addEventListener('resize',rs);
+const ch=new Rig.Character(); let x=innerWidth/2,y=innerHeight*0.9,vx=0,face=1,expr='normal',pose='idle',drag=false,px=x,walk=0,item=null,kind='important';
+const ui=document.getElementById('ui');
+for(const e of Object.keys(Rig.EXPR)){const b=document.createElement('button');b.textContent=e;b.onclick=()=>expr=e;ui.appendChild(b);}
+for(const p of Object.keys(Rig.POSES)){const b=document.createElement('button');b.textContent='['+p+']';b.onclick=()=>pose=p;ui.appendChild(b);}
+const fb=document.createElement('button');fb.textContent='flip';fb.onclick=()=>face=-face;ui.appendChild(fb);
+cv.onpointerdown=()=>drag=true; onpointerup=()=>drag=false; cv.onpointermove=e=>{if(drag){x=e.clientX;}};
+let last=performance.now();
+function frame(now){if(!x)x=px=innerWidth/2; y=innerHeight*0.93; const dt=Math.min(0.05,(now-last)/1000);last=now;
+ vx=(x-px)/Math.max(dt,1e-3); px=x; const moving=Math.abs(vx)>20; if(moving){walk+=dt*Math.abs(vx)*0.01; face=vx>0?1:-1;}
+ ch.update(dt,{face,moving,walk,vx,vy:0,expr,pose,itemKind:kind,energy:1,look:null,busyT:(window.BT ?? (now/1000)%2.6)});
+ ctx.setTransform(S,0,0,S,0,0);ctx.clearRect(0,0,innerWidth,innerHeight);
+ ctx.fillStyle='rgba(120,90,60,.15)';ctx.beginPath();ctx.ellipse(x,y+2,50,10,0,0,7);ctx.fill();
+ ch.draw(ctx,x,y,Math.min(2.2,innerHeight/330),face); requestAnimationFrame(frame);}
+requestAnimationFrame(frame);
+</script></body></html>
